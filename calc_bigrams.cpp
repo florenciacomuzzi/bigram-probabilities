@@ -7,28 +7,16 @@
 #include <iostream>
 #include <map>
 #include <string>
-//input file stream
 #include <fstream>
-//#include <cstring>
 #include <vector>
 #include <iterator>
-//using namespace std;
 
 
-
-
-//takes text file names as cmd-line arguments
 int main(int argc, const char * argv[]) {
-    /*
-     std::cout << "Total # of Args= " << argc << "\n";
-     std::cout << "prog name= " << argv[0] << std::endl;
-     std::cout << "1st argD= " << argv[1] << std::endl;
-     */
     
     std::map<std::string,int> wordCount;
     std::map<std::pair<std::string, std::string>,int> pairMap;
     
-    //for every file
     for(int i = 1; i < argc; ++i ){
         std::ifstream the_file(argv[i]);
         if (!the_file.is_open()){
