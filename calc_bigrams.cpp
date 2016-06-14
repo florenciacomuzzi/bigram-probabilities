@@ -12,8 +12,13 @@
 #include <iterator>
 
 
-template <typename T, typename K>
-void printDict(std::map<T,K>);
+template <typename T>
+void printDict(std::map<T,int>);
+
+template <typename T>
+void calcBigramProb(std::map<T,int>& dictionary, std::map<std::pair<T, T>,int>& pairDict, std::pair<T,T> input);
+
+std::pair<std::string,std::string> getInput(void);
 
 
 int main(int argc, const char * argv[]) {
@@ -62,25 +67,10 @@ int main(int argc, const char * argv[]) {
     printDict(wordCount);
             
 
-    bool playing = true;
-    while(playing){
-        std::string firstWord;
-        std::string secWord;
-        double bigramProb = 0;
-        
-        std::cout << "Please enter (2) words >";
-        std::cin >> firstWord;
-        std::cin >> secWord;
-                
-        std::map<std::string,int>::iterator unigram1 = wordCount.find(firstWord);
-        std::map<std::string,int>::iterator unigram2 = wordCount.find(secWord);
-        std::map<std::pair<std::string, std::string>,int>::iterator bigram = pairMap.find(std::make_pair(firstWord,secWord));
-        if(unigram1 != wordCount.end() && unigram2 != wordCount.end()){
-            double unigramProb = unigram1->second;
-            double bigramCount = bigram->second;
-            bigramProb = bigramCount/unigramProb;
-        }
-        std::cout << "Bigram probability for \"" << firstWord << " " << secWord << "\": " << bigramProb << std::endl;
+    int playing = 1;
+    while(playing == true){
+        auto input = getInput();
+        calcBigramProb(wordCount, pairMap, input);
         std::cout << "To try another pair, press 1 >";
         std::cin >> playing;
         std::cout << std::endl;
@@ -91,19 +81,47 @@ int main(int argc, const char * argv[]) {
 
 
 
-template <typename T, typename K>
-void printDict(std::map<T,K> dictionary){
+
+template <typename T>
+void printDict(std::map<T,int> dictionary){
     std::cout << std::endl << "************" << std::endl;
     std::cout << "\nNow printing list of words...\n";
-    for(typename std::map<T, K>::iterator it = dictionary.begin(); it != dictionary.end(); ++it){
+    for(typename std::map<T, int>::iterator it = dictionary.begin(); it != dictionary.end(); ++it){
         std::cout << it->first << " appears " << it->second << " time(s)"<< std::endl;
     }
     std::cout << std::endl << "************"<< std::endl;
     return;
 }
 
-template <typename T, typename K>
-void calcBigramProb(std::map<T,K>);
 
-                
+
+std::pair<std::string,std::string> getInput(void){
+    std::string word1 = "";
+    std::string word2 = "";
+    std::cout << "Please enter (2) words >";
+    std::cin >> word1;
+    std::cin >> word2;
+    return std::make_pair(word1, word2);
+}
+
+template <typename T>
+void calcBigramProb(std::map<T,int>& dictionary, std::map<std::pair<T, T>,int>& pairDict, std::pair<T,T> input){
+    T firstWord = input.first;
+    T secWord = input.second;
+    
+    //if pair appears together, at least 1 instance of 1st word so denom will never equal 0
+    //if pair never appears together, num = 0
+    double bigramProb = 0;
+    typename std::map<std::pair<T, T>,int>::iterator bigram = pairDict.find(input);
+    if(bigram != pairDict.end()){
+        double unigramFreq = dictionary[firstWord];
+        double bigramFreq = bigram->second;
+        bigramProb = bigramFreq/unigramFreq;
+    }
+    
+    std::cout << "Bigram probability for \"" << firstWord << " " << secWord << "\": " << bigramProb << std::endl;
+    return;
+}
+
+
 
