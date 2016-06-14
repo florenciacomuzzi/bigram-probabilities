@@ -13,6 +13,9 @@
 
 
 template <typename T>
+void processFile(std::map<T,int>&, std::map<std::pair<T, T>, int>&, std::ifstream&);
+    
+template <typename T>
 void printDict(std::map<T,int>&);
 
 template <typename T>
@@ -30,41 +33,12 @@ int main(int argc, const char * argv[]) {
     std::map<std::pair<std::string, std::string>,int> pairMap;
     
     for(int i = 1; i < argc; ++i ){
-        std::ifstream the_file(argv[i]);
-        if (!the_file.is_open()){
-            std::cout<< "Could not open file(s)";
+        std::ifstream training_file(argv[i]);
+        if (!training_file.is_open()){
+            std::cout<< "ERROR: Could not open file(s)";
             exit(-1);
         }
-
-        /*  For every word in the file
-         if string has punctuation
-         handle as if no punct
-         if word not present, strip punct else, increment count
-         */
-        std::string str;
-        std::string prev = "";
-        std::pair<std::map<std::string,int>::iterator, bool> p1;
-        std::pair<std::map<std::pair<std::string, std::string>,int>::iterator, bool> p2;
-        while(the_file >> str){
-            /*
-             if prev is empty string,
-             you are at beginning of file
-             else, insert word pair
-             */
-            if(prev != ""){
-                std::pair<std::string, std::string> toInsert = std::make_pair(prev, str);
-                p2 = pairMap.emplace(std::map<std::pair<std::string, std::string>,int>::value_type(toInsert, 1));
-                if(!p2.second){
-                    p2.first->second++;
-                }
-            }
-            //insert current word
-            p1 = wordCount.emplace(std::map<std::string,int>::value_type(str, 1));
-            if(!p1.second){
-                p1.first->second++;
-            }
-            prev = str;
-        }
+        processFile(wordCount, pairMap, training_file);
     }
     
     printDict(wordCount);
@@ -73,6 +47,30 @@ int main(int argc, const char * argv[]) {
     
     std::cout << "Goodbye.\n";
     return 0;
+}
+
+
+template <typename T>
+void processFile(std::map<T,int>& wordCounter, std::map<std::pair<T, T>, int>& bigramCounter, std::ifstream& infile){
+    std::string prev = "";
+    std::string str = "";
+    std::pair<std::map<std::string,int>::iterator, bool> p1;
+    std::pair<std::map<std::pair<std::string, std::string>,int>::iterator, bool> p2;
+    
+    while(infile){
+        infile >> str;
+        p1 = wordCounter.emplace(std::map<std::string,int>::value_type(str, 1));
+        if(!p1.second){
+            p1.first->second++;
+        }
+        std::pair<std::string, std::string> toInsert = std::make_pair(prev, str);
+        p2 = bigramCounter.emplace(std::map<std::pair<std::string, std::string>,int>::value_type(toInsert, 1));
+        if(!p2.second){
+            p2.first->second++;
+        }
+        prev = str;
+    }
+    return;
 }
 
 
