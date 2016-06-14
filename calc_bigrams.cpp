@@ -29,7 +29,7 @@ void play(std::map<T,int>& dictionary, std::map<std::pair<T, T>,int>& pairDict);
 
 int main(int argc, const char * argv[]) {
     
-    std::map<std::string,int> wordCount;
+    std::map<std::string,int> wordCounter;
     std::map<std::pair<std::string, std::string>,int> pairMap;
     
     for(int i = 1; i < argc; ++i ){
@@ -38,12 +38,12 @@ int main(int argc, const char * argv[]) {
             std::cout<< "ERROR: Could not open file(s)";
             exit(-1);
         }
-        processFile(wordCount, pairMap, training_file);
+        processFile(wordCounter, pairMap, training_file);
     }
     
-    printDict(wordCount);
+    printDict(wordCounter);
     
-    play(wordCount, pairMap);
+    play(wordCounter, pairMap);
     
     std::cout << "Goodbye.\n";
     return 0;
